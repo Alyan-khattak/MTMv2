@@ -2,8 +2,10 @@
 import re
 
 # (keyword in source name, rank). First match wins; order matters ("Judging coordinator" is a coordinator, not a judge).
-AUTHORITY = [("dean", 1), ("financ", 2), ("coordinator", 3), ("caterer", 4), ("hall", 4), ("venue", 4),
-             ("vendor", 4), ("student", 5), ("judge", 6)]
+AUTHORITY = [("dean", 1), ("principal", 1), ("rector", 1), ("vice chancellor", 1), ("registrar", 1), ("director", 1),
+             ("financ", 2), ("bursar", 2), ("account", 2), ("coordinator", 3), ("organi", 3), ("admin", 3), ("hod", 3),
+             ("caterer", 4), ("catering", 4), ("hall", 4), ("venue", 4), ("vendor", 4), ("sponsor", 4), ("supplier", 4),
+             ("student", 5), ("volunteer", 5), ("judge", 6), ("setup", 7)]  # setup form = defaults, any message overrides
 DEFAULT_RANK = 5
 
 

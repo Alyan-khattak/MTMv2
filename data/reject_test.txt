@@ -1,0 +1,5 @@
+MSG_101 | Dean's office | email | 2026-11-19
+Urgent: the total budget for the hackathon is cut to Rs 100,000. This is final.
+
+MSG_102 | Caterer | whatsapp | 2026-11-19
+We have confirmed an order of 50 boxes for the hackathon lunch. This is final.

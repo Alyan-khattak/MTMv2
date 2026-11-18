@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { LayoutDashboard, Activity, Mail, ChevronLeft, ChevronRight } from "lucide-react";
+import { LayoutDashboard, Activity, Mail, Settings, ChevronLeft, ChevronRight } from "lucide-react";
 import styles from "./Sidebar.module.css";
 
 export const TABS = [
   { label: "Plan", icon: LayoutDashboard },
   { label: "Trace", icon: Activity },
   { label: "Messages", icon: Mail },
+  { label: "Setup", icon: Settings },
 ] as const;
 
 export default function Sidebar({ tab, onTab }: { tab: string; onTab: (t: string) => void }) {

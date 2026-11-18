@@ -34,7 +34,7 @@
   font-size: 1.15rem;
   font-weight: 800;
   letter-spacing: -0.03em;
-  color: #fff;
+  color: #2b1405;
 }
 
 .collapseBtn {
@@ -52,7 +52,7 @@
 }
 
 .collapseBtn:hover {
-  color: #fff;
+  color: #2b1405;
 }
 
 .nav {
@@ -90,7 +90,7 @@
 
 .navItem.active {
   background: rgba(255, 255, 255, 0.1);
-  color: #fff;
+  color: #2b1405;
 }
 
 .navItem svg {

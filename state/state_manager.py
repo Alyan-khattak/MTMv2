@@ -41,6 +41,14 @@ class StateManager:
             return {**empty_state(), **data}
         return empty_state()
 
+    def archive(self):
+        """Set the current state aside (kept as .old) so the next run starts fresh."""
+        if self.path.exists():
+            os.replace(self.path, self.path.with_name(self.path.name + ".old"))
+        for p in (self.bak, self.tmp):
+            if p.exists():
+                p.unlink()
+
     def save(self, state):
         state = {**state, "last_updated": datetime.now().isoformat(timespec="seconds")}
         payload = json.dumps(state, indent=2, ensure_ascii=False)

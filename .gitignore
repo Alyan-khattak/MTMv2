@@ -11,3 +11,7 @@ __pycache__/
 .pytest_cache/
 frontend/node_modules/
 frontend/.next/
+
+state.json.old
+final_output.json
+hackathons/

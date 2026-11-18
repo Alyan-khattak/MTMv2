@@ -1,4 +1,4 @@
-"""Groq client wrapper (TASK-006) and the LLM fact extractor (area: reading)."""
+"""Groq client wrapper and the LLM fact extractor (area: reading). One call reads the whole pack."""
 import os
 
 from models.schemas import model_name
@@ -28,15 +28,18 @@ class GroqClient:
 
 
 # Vocabulary of fact keys (structure, not event values).
-SYSTEM = """You extract event-planning facts from ONE message (English or Roman Urdu).
-Reply with JSON only: {"facts":[{"key":str,"subject":str|null,"value":number|boolean,"approved":boolean}]}
+SYSTEM = """You extract event-planning facts from several numbered messages (English or Roman Urdu).
+Reply with JSON only: {"messages":[{"n":int,"facts":[{"key":str,"subject":str|null,"value":number|boolean,"approved":boolean}]}]}
+Give one entry per message number; use "facts":[] when a message has no planning facts.
 Allowed keys:
-event.student_count, event.team_size (students per team), event.staff_count, event.duration_hours, event.budget_limit (total, rupees), event.prayer_break_minutes,
+event.student_count, event.team_size (students per team), event.staff_count, event.guest_count (extra people to seat and feed besides students, staff and judges), event.duration_hours, event.start_hour (24h clock hour the event starts), event.budget_limit (total, rupees), event.prayer_break_minutes, event.lunch_break_minutes,
 venue.capacity, venue.price, venue.generator (true/false) - subject = venue name; emit all three for every venue named,
-food.price_per_person - subject = package name (e.g. standard, basic); food.box_count (number of food boxes/meals ordered),
-judging.judge_count, judging.honorarium (per judge), judging.minutes_per_team, judging.max_teams_per_judge,
-budget.prizes, budget.backup_internet, budget.printing_cost, budget.dj (rupee amounts already spent/ordered or quoted).
-Rules: write numbers as digits in rupees/minutes/hours. approved=false when the message only asks or proposes (a question, a quote awaiting a decision); true when it states a decision, order, price list or confirmation. Use subject=null when not applicable. If the message has no planning facts, return {"facts":[]}."""
+venue.max_price, venue.min_capacity, venue.requires_generator (true if a generator is mandatory), venue.closing_hour (24h hour the venue must be empty),
+food.price_per_person - subject = package name (e.g. standard, basic); food.max_price_per_person (a cap on any package); food.box_count (number of food boxes/meals ordered),
+judging.judge_count, judging.min_judges, judging.honorarium (per judge), judging.minutes_per_team, judging.max_teams_per_judge,
+budget.<item> for ANY other rupee cost already spent, ordered or quoted - use a short snake_case item name, e.g. budget.prizes, budget.backup_internet, budget.printing_cost, budget.dj, budget.security,
+note.<short_snake_name> for any other rule or constraint that none of the keys above can express: value true, subject = one plain sentence describing it.
+Rules: write numbers as digits in rupees/minutes/hours. approved=false when the message only asks or proposes (a question, a quote awaiting a decision); true when it states a decision, order, price list or confirmation. Use subject=null when not applicable. Facts must come only from the message they are listed under."""
 
 
 def _num(v):
@@ -52,14 +55,9 @@ def _num(v):
     return None
 
 
-def read_message(ctx, msg):
-    """Returns list of {key, subject, value, approved}, or None if the model call failed."""
-    user = f"Source: {msg['source']}\nChannel: {msg['channel']}\nDate: {msg['date']}\nMessage: {msg['text']}"
-    out = ctx.call("reading", SYSTEM, user)
-    if not isinstance(out, dict) or not isinstance(out.get("facts"), list):
-        return None
+def _clean(raw):
     facts = []
-    for f in out["facts"]:
+    for f in raw if isinstance(raw, list) else []:
         if not isinstance(f, dict) or not isinstance(f.get("key"), str):
             continue
         value = _num(f.get("value"))
@@ -70,3 +68,27 @@ def read_message(ctx, msg):
         facts.append({"key": f["key"].strip(), "subject": subject, "value": value,
                       "approved": f.get("approved") is not False})
     return facts
+
+
+def read_messages(ctx, msgs):
+    """Returns {1-based message position: [{key, subject, value, approved}]} for every message the model answered.
+    Empty dict if the call failed. One retry: a bad reply must not lose the whole pack."""
+    user = "\n\n".join(f"[{i}] Source: {m['source']}\nChannel: {m['channel']}\nDate: {m['date']}\nMessage: {m['text']}"
+                       for i, m in enumerate(msgs, 1))
+    for _ in range(2):
+        out = ctx.call("reading", SYSTEM, user)
+        if isinstance(out, dict) and isinstance(out.get("messages"), list):
+            break
+        if ctx.exhausted or ctx.timed_out:
+            return {}
+    else:
+        return {}
+    res = {}
+    for e in out["messages"]:
+        try:
+            n = int(e["n"])
+        except (KeyError, TypeError, ValueError):
+            continue
+        if isinstance(e, dict) and 1 <= n <= len(msgs):
+            res[n] = _clean(e.get("facts"))
+    return res

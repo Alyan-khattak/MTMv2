@@ -1,14 +1,13 @@
 """Pure arithmetic. No LLM. Also hosts the shared cost/headcount helpers."""
 import math
 
-FIXED_KEYS = {"prizes": "budget.prizes", "backup_internet": "budget.backup_internet",
-              "printing": "budget.printing_cost", "dj": "budget.dj"}
+RESERVED = {"venue", "food", "judging_honorarium", "total", "limit", "remaining", "within_budget", "selection_method"}
 
 
 def headcount(facts):
-    """students + staff + judges, always computed from accepted facts. None if any is unknown."""
+    """students + staff + judges + extra guests, always computed from accepted facts. None if a required one is unknown."""
     parts = [facts.get("event.student_count"), facts.get("event.staff_count"), facts.get("judging.judge_count")]
-    return None if any(p is None for p in parts) else sum(parts)
+    return None if any(p is None for p in parts) else sum(parts) + facts.get("event.guest_count", default=0)
 
 
 def teams(facts):
@@ -17,7 +16,17 @@ def teams(facts):
 
 
 def fixed_costs(facts):
-    return {name: facts.get(key, default=0) for name, key in FIXED_KEYS.items()}
+    """Every accepted `budget.<item>` fact is a cost, so a cost kind never seen before is still counted."""
+    out = {}
+    for f in facts.items:
+        k, v = f["key"], f["value"]
+        if not k.startswith("budget.") or isinstance(v, bool) or not isinstance(v, (int, float)):
+            continue
+        name = k[len("budget."):].removesuffix("_cost")
+        if f.get("subject"):
+            name += "_" + f["subject"].lower().replace(" ", "_")
+        out["extra_" + name if name in RESERVED else name] = v
+    return out
 
 
 def honorarium_total(facts):

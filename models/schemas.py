@@ -77,6 +77,7 @@ class Plan:
     budget: Optional[dict] = None
     constraint_result: Optional[dict] = None
     rejection_reason: Optional[str] = None
+    unenforced: list = field(default_factory=list)  # facts the planner cannot check, shown so nothing is silently ignored
 
 
 @dataclass
