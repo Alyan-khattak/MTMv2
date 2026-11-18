@@ -158,6 +158,9 @@ export default function Home() {
           {tab === "Trace" && <Trace data={trace} />}
           {tab === "Messages" && <Messages data={msgs} />}
           {tab === "Setup" && <Setup api={api} hack={hack} onSaved={id => { loadHacks(); if (id !== hack) setHack(id); else refresh(); }} />}
+          {tab !== "Setup" && <div className="card"><h3>Download report</h3>
+            <a href={`/report.txt?h=${encodeURIComponent(hack)}`} download="final_output.txt">Plan and model calls (.txt)</a>
+            {" | "}<a href={`/export?h=${encodeURIComponent(hack)}`} download="final_output.json">Full data (.json)</a></div>}
           {tab !== "Setup" && <div className="card"><h3>Upload a messages file (.txt)</h3>
             <input type="file" accept=".txt,text/plain" disabled={running} onChange={upload} />
             <small>Runs the same way as the command line and checks the plan against every rule.</small></div>}

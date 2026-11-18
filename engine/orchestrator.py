@@ -62,7 +62,7 @@ def _split_source(s):
 
 def _header(line):
     """`ID | source[, channel] | [channel |] date [| text]` in any column order -> dict, or None."""
-    parts = [p.strip() for p in line.strip().strip("|").split("|")]
+    parts = [re.sub(r"(?i)^(from|source|sender|date|channel|id)\s*:\s*", "", p.strip()) for p in line.strip().strip("|").split("|")]
     if len(parts) < 3:
         return None
     di = next((i for i, p in enumerate(parts) if parse_date(p)), None)
@@ -113,6 +113,11 @@ def parse_messages(text):
     out = [m for m in out if m["text"]] or _blocks_kv(text)
     if text.strip() and not out:
         raise ValueError("Could not read any messages from the file (expected `ID | source | channel | date` headers)")
+    used = {m["id"] for m in out if m["id"]}
+    for m in out:  # strip wrapping quotes; bare numeric ids ("#1") become MSG_001
+        m["text"] = m["text"].strip(" \"'\u201c\u201d")
+        if m["id"] and m["id"].isdigit():
+            m["id"] = f"MSG_{int(m['id']):03d}"
     used = {m["id"] for m in out if m["id"]}
     for i, m in enumerate(out, 1):
         if not m["id"]:
@@ -385,9 +390,30 @@ def format_plan(state, rec=None):
     return "\n".join(x for x in out if x)
 
 
+def report_text(state):
+    """Submission file: the plan for all five areas, then one line per model call and a total."""
+    plan = {p["id"]: p for p in state["plans"]}.get(state["active_plan_id"])
+    out = ["PLAN"]
+    if plan:
+        v, f, j, s, b = (plan[k] for k in ("venue", "food", "judging", "schedule", "budget"))
+        out += [f"Venue:    {v['name']} - {v['capacity']} seats - Rs {v['price']:,}",
+                "Schedule: " + " -> ".join(f"{x['time']} {x['label']}" for x in s["blocks"]),
+                f"Food:     {f['package']} - {f['headcount']} boxes x Rs {f['price_per_person']:,} = Rs {f['total_cost']:,}",
+                f"Judging:  {j['judge_count']} judges - Rs {j['total_honorarium']:,}",
+                f"Budget:   Rs {b['total']:,} of Rs {b['limit']:,} - " + ("FITS" if b["within_budget"] else "OVER BUDGET")]
+        out += [f"Note (not enforced): {u['subject'] or u['key']}" for u in plan.get("unenforced", [])]
+    else:
+        out.append("No valid plan yet.")
+    out += ["", "TRACE", "Call | Model | Used for | Tokens"]
+    calls = [t for t in state["trace"] if t["call_number"] and t["status"] in ("SUCCESS", "ERROR")]
+    out += [f"{t['call_number']} | {t['model']} | {t['area']} | {t['total_tokens']}" for t in calls]
+    out.append(f"TOTAL: {len(calls)} calls | {sum(t['total_tokens'] for t in calls)} tokens")
+    return "\n".join(out)
+
+
 def export_payload(state):
     """Everything the judges need in one file: final plan, flagged messages and the complete trace."""
     plans = {p["id"]: p for p in state["plans"]}
     return {"plan": plans.get(state["active_plan_id"]), "runs": state["runs"],
             "messages": [{k: m[k] for k in ("id", "source", "channel", "date", "status", "reason")} for m in state["messages"]],
-            "trace": state["trace"], "trace_text": format_trace(state)}
+            "trace": state["trace"], "trace_text": format_trace(state), "report_text": report_text(state)}

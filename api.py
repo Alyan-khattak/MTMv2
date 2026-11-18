@@ -7,6 +7,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Query
+from fastapi.responses import PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
@@ -17,7 +18,7 @@ from agents.reading_agent import GroqClient  # noqa: E402
 from engine.predict import predict  # noqa: E402
 from engine.setup import setup_message, text_to_config  # noqa: E402
 from state.state_manager import StateManager  # noqa: E402
-from engine.orchestrator import Orchestrator, export_payload, parse_messages  # noqa: E402
+from engine.orchestrator import Orchestrator, export_payload, parse_messages, report_text  # noqa: E402
 
 app = FastAPI(title="Hackathon Event Planner")
 ROOT = Path("hackathons")  # one folder per hackathon: config.json + state.json. "default" is the original state.json.
@@ -204,4 +205,11 @@ def messages(h: str = Query("default")):
     return [{**m, "facts": facts.get(m["id"], [])} for m in s["messages"]]
 
 
+@app.get("/report.txt", response_class=PlainTextResponse)
+def report(h: str = Query("default")):
+    return PlainTextResponse(report_text(orch_for(h).sm.load()),
+                             headers={"Content-Disposition": "attachment; filename=final_output.txt"})
+
+
 app.mount("/", StaticFiles(directory="frontend/out", html=True), name="ui")
+

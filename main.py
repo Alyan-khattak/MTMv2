@@ -10,7 +10,7 @@ load_dotenv(".env")
 
 from engine.predict import predict  # noqa: E402
 from state.state_manager import StateManager  # noqa: E402
-from engine.orchestrator import Orchestrator, export_payload, format_plan, format_trace, parse_messages  # noqa: E402
+from engine.orchestrator import Orchestrator, export_payload, format_plan, format_trace, parse_messages, report_text  # noqa: E402
 
 
 def main(argv=None):
@@ -38,7 +38,10 @@ def main(argv=None):
     out = os.getenv("OUTPUT_FILE", "final_output.json")  # final plan + full trace of every run, for submission
     with open(out, "w", encoding="utf-8") as f:
         json.dump(export_payload(state), f, indent=2, ensure_ascii=False)
-    print(f"\nSaved plan + full trace to {out}")
+    txt = os.getenv("OUTPUT_TXT", "final_output.txt")  # the readable file: plan + one line per model call
+    with open(txt, "w", encoding="utf-8") as f:
+        f.write(report_text(state) + "\n")
+    print(f"\nSaved plan + full trace to {out} and {txt}")
     print(f"\nOutcome: {rec['outcome']}  planners={rec['planners_run']}  time={rec['duration_seconds']}s")
 
 
