@@ -135,7 +135,7 @@ export default function Home() {
     setRunning(true); setErr("");
     try {
       const r = await api("/upload", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text: await file.text() }) });
-      setErr(`${file.name}: ${r.outcome}`);
+      setErr(r.outcome === "NO_CHANGE" ? `${file.name}: nothing new. Every message in it was already processed, so the plan is unchanged.` : `${file.name}: ${r.outcome}`);
     } catch (x: A) { setErr(x.message); }
     setRunning(false); refresh();
   }

@@ -1,0 +1,14 @@
+PK_001 | Dean's office | email | 2026-11-20
+The hackathon is 5 hours long. 120 students will take part in teams of 4. There are 8 staff members. The total budget is Rs 500,000. Prayer break is 20 minutes.
+
+PK_002 | Hall manager | whatsapp | 2026-11-20
+Venues available: Room X seats 100 at Rs 30,000 with no generator. Hall Y seats 160 at Rs 90,000 with a standby generator. Hall Z seats 250 at Rs 200,000 with a standby generator.
+
+PK_003 | Caterer | email | 2026-11-20
+Lunch box prices per person: Standard Rs 900, Basic Rs 600.
+
+PK_004 | Judging coordinator | email | 2026-11-20
+We have 10 judges. Each is paid Rs 4,000. Each team gets 15 minutes. No judge may see more than 4 teams.
+
+PK_005 | Finance | email | 2026-11-20
+Prizes cost Rs 60,000 and printing costs Rs 8,000.
