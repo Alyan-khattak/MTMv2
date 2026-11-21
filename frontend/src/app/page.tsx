@@ -99,7 +99,7 @@ function Messages({ data }: { data: A }) {
 }
 
 export default function Home() {
-  const [tab, setTab] = useState("Plan");
+  const [tab, setTab] = useState("Hackathon Plan");
   const [plan, setPlan] = useState<A>(null);
   const [trace, setTrace] = useState<A>(null);
   const [msgs, setMsgs] = useState<A>([]);
@@ -153,13 +153,14 @@ export default function Home() {
           <div className="status">{run
             ? <>Last run <b>{run.id}</b> · {run.type} · <Badge s={run.outcome} /> · {run.duration_seconds}s · {run.model_calls} calls · {run.total_tokens} tokens{plan.pending_planners?.length ? " · pending: " + plan.pending_planners.join(", ") : ""}</>
             : "No runs yet. Submit a message or run the CLI."}</div>
-          {tab === "Plan" && <div className="card">Prediction for the next change: <b>{predictText}</b></div>}
-          {tab === "Plan" && <Plan data={plan} />}
+          {tab === "Hackathon Plan" && <div className="card">Prediction for the next change: <b>{predictText}</b></div>}
+          {tab === "Hackathon Plan" && <Plan data={plan} />}
           {tab === "Trace" && <Trace data={trace} />}
           {tab === "Messages" && <Messages data={msgs} />}
           {tab === "Setup" && <Setup api={api} hack={hack} onSaved={id => { loadHacks(); if (id !== hack) setHack(id); else refresh(); }} />}
           {tab !== "Setup" && <div className="card"><h3>Download report</h3>
-            <a href={`/report.txt?h=${encodeURIComponent(hack)}`} download="final_output.txt">Plan and model calls (.txt)</a>
+            <a href={`/report.pdf?h=${encodeURIComponent(hack)}`} download="hackathon_report.pdf"><b>Report with pass/reject per message (.pdf)</b></a>
+            {" | "}<a href={`/report.txt?h=${encodeURIComponent(hack)}`} download="final_output.txt">Plan and model calls (.txt)</a>
             {" | "}<a href={`/export?h=${encodeURIComponent(hack)}`} download="final_output.json">Full data (.json)</a></div>}
           {tab !== "Setup" && <div className="card"><h3>Upload a messages file (.txt)</h3>
             <input type="file" accept=".txt,text/plain" disabled={running} onChange={upload} />

@@ -1,7 +1,7 @@
 .sidebar {
   width: 220px;
   min-height: 100vh;
-  background: var(--charcoal-1, #181818);
+  background: linear-gradient(170deg, #F9C79B 0%, #F6B07A 55%, #F2A07F 100%);
   display: flex;
   flex-direction: column;
   flex-shrink: 0;

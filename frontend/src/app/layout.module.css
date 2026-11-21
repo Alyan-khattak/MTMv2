@@ -1,7 +1,7 @@
 .shell {
   display: flex;
   min-height: 100vh;
-  background: #FFF4D6;
+  background: linear-gradient(160deg, #FFF8F0 0%, #FFEFE0 50%, #FDE8EC 100%) fixed;
 }
 
 .main {

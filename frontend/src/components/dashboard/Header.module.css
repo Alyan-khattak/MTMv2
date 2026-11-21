@@ -5,7 +5,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #FFF4D6;
+  background: linear-gradient(90deg, #FFF8F0, #FFEBD6);
   position: sticky;
   top: 0;
   z-index: 10;

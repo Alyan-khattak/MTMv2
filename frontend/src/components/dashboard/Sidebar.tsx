@@ -5,7 +5,7 @@ import { LayoutDashboard, Activity, Mail, Settings, ChevronLeft, ChevronRight } 
 import styles from "./Sidebar.module.css";
 
 export const TABS = [
-  { label: "Plan", icon: LayoutDashboard },
+  { label: "Hackathon Plan", icon: LayoutDashboard },
   { label: "Trace", icon: Activity },
   { label: "Messages", icon: Mail },
   { label: "Setup", icon: Settings },
@@ -16,7 +16,7 @@ export default function Sidebar({ tab, onTab }: { tab: string; onTab: (t: string
   return (
     <aside className={`${styles.sidebar} ${collapsed ? styles.collapsed : ""}`}>
       <div className={styles.top}>
-        <div className={styles.logo}>{!collapsed && <span className={styles.logoText}>Planner</span>}</div>
+        <div className={styles.logo}>{!collapsed && <span className={styles.logoText}>Compass</span>}</div>
         <button className={styles.collapseBtn} onClick={() => setCollapsed(!collapsed)} aria-label="Toggle sidebar">
           {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
         </button>

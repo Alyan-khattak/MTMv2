@@ -1,4 +1,4 @@
-:root{--foreground:#181818;--charcoal-1:#FC6C26;--charcoal-2:#65717c;--accent-sky:#FFF4D6;--border-color:#f0d59a;
+:root{--foreground:#181818;--charcoal-1:#F6B07A;--charcoal-2:#65717c;--accent-sky:#FFF8F0;--border-color:#F0E2D2;
 --acc:#16a34a;--rej:#dc2626;--sup:#71717a;--irr:#d97706;
 --reading:#6366f1;--venue:#0ea5e9;--food:#f59e0b;--judging:#8b5cf6;--schedule:#10b981;--budget:#ef4444}
 
@@ -21,7 +21,7 @@ details summary{cursor:pointer;display:flex;gap:8px;align-items:center;flex-wrap
 textarea,input,select{width:100%;font:inherit;padding:8px;border:1px solid var(--border-color);border-radius:6px;background:var(--accent-sky)}
 textarea{min-height:70px;margin-bottom:8px}.row{display:flex;gap:8px}.row select{width:130px}
 #submit{background:var(--charcoal-1);color:#2b1405;font-weight:600;border:0;border-radius:6px;padding:8px 16px;cursor:pointer;display:flex;gap:6px;align-items:center;white-space:nowrap;font:inherit}
-#submit:disabled{opacity:.5;cursor:wait}.err{color:var(--rej);margin-top:6px}
+#submit:disabled{opacity:.5;cursor:wait}.err{color:#9a4a0a;margin-top:8px;padding:8px 12px;border-radius:10px;background:linear-gradient(135deg,#fff3e3,#ffe0bf 55%,#ffd1a3)}.err:empty{display:none}
 table{width:100%;border-collapse:collapse}td{padding:3px 0}td:last-child{text-align:right}
 
 .fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:6px}
@@ -29,4 +29,29 @@ table{width:100%;border-collapse:collapse}td{padding:3px 0}td:last-child{text-al
 .chk{display:flex;align-items:center;gap:6px;white-space:nowrap;font-size:.85rem}.chk input{width:auto}
 .card .row{margin-bottom:8px;flex-wrap:wrap}.card .row input{flex:1;min-width:110px}
 
-button{background:#FC6C26;color:#2b1405;border:0;border-radius:6px;padding:6px 12px;cursor:pointer;font:inherit;font-weight:600}button:disabled{opacity:.5;cursor:default}.filters button{background:#fff;font-weight:400}.filters button.on{background:#FC6C26}
+button{background:#F6B07A;color:#2b1405;border:0;border-radius:6px;padding:6px 12px;cursor:pointer;font:inherit;font-weight:600}button:disabled{opacity:.5;cursor:default}.filters button{background:#fff;font-weight:400}.filters button.on{background:#F6B07A}
+
+/* ---- visual polish: gradients, motion, hover feedback (styling only) ---- */
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes shimmer{0%{background-position:0 0}100%{background-position:200% 0}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(246,176,122,.5)}50%{box-shadow:0 0 0 8px rgba(246,176,122,0)}}
+.card{background:linear-gradient(145deg,#fff 0%,#fffaf4 100%);box-shadow:0 2px 10px rgba(240,150,90,.08);animation:rise .5s ease both;transition:transform .2s ease,box-shadow .2s ease}
+.card:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(240,150,90,.18)}
+.grid>.card:nth-child(2){animation-delay:.07s}.grid>.card:nth-child(3){animation-delay:.14s}.grid>.card:nth-child(4){animation-delay:.21s}.grid>.card:nth-child(5){animation-delay:.28s}
+.stack>.card:nth-child(2){animation-delay:.05s}.stack>.card:nth-child(3){animation-delay:.1s}.stack>.card:nth-child(4){animation-delay:.15s}
+.bar{background:linear-gradient(90deg,#FFF1E2,#FFE6CF)}
+.bar i{background:linear-gradient(90deg,#F9C79B,#F6B07A,#EE8F6B);transform-origin:left;animation:grow .9s cubic-bezier(.2,.8,.2,1) both}
+.badge{background-image:linear-gradient(135deg,rgba(255,255,255,.28),rgba(255,255,255,0));transition:transform .15s}.badge:hover{transform:scale(1.06)}
+button,#submit{background-image:linear-gradient(135deg,#FAC9A0,#F6B07A 55%,#F2A07F);transition:transform .15s ease,box-shadow .15s ease,filter .15s}
+button:hover:not(:disabled),#submit:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 14px rgba(240,150,90,.35);filter:brightness(1.04)}
+button:active:not(:disabled){transform:translateY(0) scale(.97)}
+.filters button{background-image:none}.filters button:hover{background:#FFF1E2}.filters button.on{background-image:linear-gradient(135deg,#FAC9A0,#F6B07A)}
+textarea,input,select{transition:border-color .2s,box-shadow .2s,background .2s}
+textarea:focus,input:focus,select:focus{outline:none;border-color:#F6B07A;box-shadow:0 0 0 3px rgba(246,176,122,.28);background:#fff}
+.err{animation:rise .35s ease both}
+details{transition:background .2s}details:hover summary{color:#c2672f}
+pre{background:linear-gradient(145deg,#FFF8F0,#FFF1E2)}
+a{transition:color .15s}.card a:hover{color:#c2672f;text-decoration:underline}
+.dot{animation:pulse 2.4s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
